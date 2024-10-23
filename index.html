@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Monitoring</title>
+    <style>
+        body {
+            font-family: 'Bubblegum Sans', cursive;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #74ebd5, #ACB6E5); /* Sky-like gradient */
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-top: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px; /* Limits the width on larger screens */
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            width: 100%; /* Full width */
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: #f8f9fa;
+        }
+
+        button {
+            background: linear-gradient(to right, #f7971e, #ffd200);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #fcb045, #fd1d1d);
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Full width */
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result-box p {
+            margin: 5px 0;
+            font-weight: bold;
+            color: #333;
+        }
+
+        canvas {
+            margin-top: 20px;
+            width: 100%; /* Full width */
+            height: 400px; /* Fixed height */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Weather Monitoring System</h1>
+
+    <div class="container">
+        <!-- Chart Canvas -->
+        <canvas id="weather-chart"></canvas>
+
+        <h2>Hourly Weather</h2>
+        <form id="city-form">
+            <label for="city">City Name:</label>
+            <input type="text" id="city" name="city" required placeholder="Enter city name">
+
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <button type="submit">Get Weather</button>
+        </form>
+
+        <h2>Set Alerts</h2>
+        <form id="alert-form">
+            <label for="threshold">Temperature Threshold (°C):</label>
+            <input type="number" id="threshold" name="threshold" required placeholder="e.g., 35">
+
+            <label for="email">Email for Alerts:</label>
+            <input type="email" id="email" name="email" required placeholder="you@example.com">
+
+            <button type="submit">Set Alert</button>
+        </form>
+
+        <div class="result-box" id="weather-result" style="display: none;">
+            <p><span id="city-name"></span> Weather:</p>
+            <p>Temperature: <span id="temp">-</span>°C</p>
+            <p>Humidity: <span id="humidity">-</span>%</p>
+            <p>Wind Speed: <span id="wind">-</span> m/s</p>
+            <p>Pressure: <span id="pressure">-</span> hPa</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('city-form').onsubmit = function (e) {
+            e.preventDefault();
+            const city = document.getElementById('city').value;
+            const date = document.getElementById('date').value;
+
+            // Dummy data for now (replace with actual API call in real implementation)
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const temperatures = [22, 24, 26, 25, 27, 23, 21];
+            const humidities = [55, 60, 65, 70, 68, 64, 62];
+            const windSpeeds = [5, 7, 6, 4, 8, 5, 3];
+            const pressures = [1015, 1012, 1010, 1013, 1014, 1011, 1015];
+
+            document.getElementById('city-name').innerText = city;
+            document.getElementById('temp').innerText = temperatures[0]; // Displaying only the first temp as an example
+            document.getElementById('humidity').innerText = humidities[0];
+            document.getElementById('wind').innerText = windSpeeds[0];
+            document.getElementById('pressure').innerText = pressures[0];
+
+            document.getElementById('weather-result').style.display = 'block';
+
+            // Render the chart with dummy data
+            renderChart(days, temperatures, humidities, windSpeeds, pressures);
+            alert(`Fetching hourly weather for ${city} on ${date}`);
+        };
+
+        document.getElementById('alert-form').onsubmit = function (e) {
+            e.preventDefault();
+            const threshold = document.getElementById('threshold').value;
+            const email = document.getElementById('email').value;
+            alert(`Alert set for temperature threshold of ${threshold}°C. Alerts will be sent to ${email}`);
+        };
+
+        function renderChart(days, temperatures, humidities, windSpeeds, pressures) {
+            const ctx = document.getElementById('weather-chart').getContext('2d');
+
+            // Destroy the previous chart instance if it exists
+            if (window.weatherChart) {
+                window.weatherChart.destroy();
+            }
+
+            // Create a new chart with a bar graph style
+            window.weatherChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: temperatures,
+                            backgroundColor: 'rgba(255, 99, 71, 0.8)',
+                            borderColor: 'rgba(255, 99, 71, 1)',
+                            borderWidth: 2,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Humidity (%)',
+                            data: humidities,
+                            backgroundColor: 'rgba(30, 144, 255, 0.8)',
+                            borderColor: 'rgba(30, 144, 255, 1)',
+                            borderWidth: 2,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Wind Speed (m/s)',
+                            data: windSpeeds,
+                            backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                            borderColor: 'rgba(255, 215, 0, 1)',
+                            borderWidth: 2,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Pressure (hPa)',
+                            data: pressures,
+                            backgroundColor: 'rgba(50, 205, 50, 0.8)',
+                            borderColor: 'rgba(50, 205, 50, 1)',
+                            borderWidth: 2,
+                            barPercentage: 0.6,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Days'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            enabled: true,
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
